@@ -27,4 +27,4 @@ Das Tool kann die Dateien als Word oder HTML-Dateien exportieren, und hier wahlw
 Entwicklung
 -----------
 
-Das Tool verwendet das Mac OS X 10.6 SDK, welches standardmäßig nicht in Xcode 4.4 (Mountain Lion) oder höher enthalten ist. Man kann Xcode 4.3 über das Mac Developer Center herunterladen und dass SDK daraus verwenden, oder alternativ das Projekt auf 10.7 oder 10.8 upgraden.
+Das Tool läuft auf Mac OS X 10.6, verwendet aber das SDK von 10.7 (mit 10.6) als Deployment target). Praktisch heißt dies, dass man nur mit 10.7 oder höher an dem Programm entwickeln kann. Support für 10.6 werde ich aber erst mal drin behalten.
