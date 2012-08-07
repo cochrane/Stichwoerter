@@ -1,0 +1,23 @@
+/* 
+   Localizable.strings
+   Stichwörter
+
+   Created by Torsten Kammer on 20.09.09.
+   Copyright 2009 __MyCompanyName__. All rights reserved.
+ */
+
+
+/* Export date header */
+"Entered on" = "Eingetragen";
+
+/* Export keyword header */
+"Keyword" = "Stichwort";
+
+/* Export page header */
+"On Page" = "Auf Seite";
+
+/* Export page list header */
+"On Pages" = "Auf Seiten";
+
+/* Prompt for export save panel */
+"Export" = "Exportieren";

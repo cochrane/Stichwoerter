@@ -1,0 +1,21 @@
+body
+{
+	margin:0px;
+	padding:0px;
+	font-family:'Lucida Grande';
+	background-color: black;
+	color: white;
+}
+
+table
+{
+	width:100%;
+	border-collapse: collapse;
+}
+
+th, td
+{
+	border-width: 1px;
+	border-style: solid;
+	border-color: rgba(1, 1, 1, 1);
+}
