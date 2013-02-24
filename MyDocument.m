@@ -75,27 +75,26 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 - (void)insertEntryWithWord:(NSString *)word date:(NSDate *)date page:(NSInteger)page;
 {
 	// First step: Find if word already exists.
-	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-	[fetchRequest setEntity:[NSEntityDescription entityForName:@"Keyword" inManagedObjectContext:[self managedObjectContext]]];
-	[fetchRequest setFetchLimit:1];
-	[fetchRequest setIncludesPropertyValues:NO];
-	[fetchRequest setIncludesPendingChanges:YES];
-	[fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"word = %@", word]];
+	NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"Keyword"];
+	fetchRequest.fetchLimit = 1;
+	fetchRequest.includesPropertyValues = NO;
+	fetchRequest.includesPendingChanges = YES;
+	fetchRequest.predicate = [NSPredicate predicateWithFormat:@"word = %@", word];
 	
-	NSArray *result = [[self managedObjectContext] executeFetchRequest:fetchRequest error:NULL];
+	NSArray *result = [self.managedObjectContext executeFetchRequest:fetchRequest error:NULL];
 	
 	NSManagedObject *keyword = nil;
-	if ([result count] == 0)
+	if (result.count == 0)
 	{
-		keyword = [NSEntityDescription insertNewObjectForEntityForName:@"Keyword" inManagedObjectContext:[self managedObjectContext]];
+		keyword = [NSEntityDescription insertNewObjectForEntityForName:@"Keyword" inManagedObjectContext:self.managedObjectContext];
 		[keyword setValue:word forKey:@"word"];
 	}
 	else
 		keyword = [result objectAtIndex:0];
 	
 	// Enter entry
-	NSManagedObject *entry = [NSEntityDescription insertNewObjectForEntityForName:@"Entry" inManagedObjectContext:[self managedObjectContext]];
-	[entry setValue:[NSNumber numberWithInteger:page] forKey:@"page"];
+	NSManagedObject *entry = [NSEntityDescription insertNewObjectForEntityForName:@"Entry" inManagedObjectContext:self.managedObjectContext];
+	[entry setValue:@(page) forKey:@"page"];
 	[entry setValue:keyword forKey:@"word"];
 	[entry setValue:date forKey:@"enteredOn"];
 }
@@ -109,15 +108,14 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 	[controller runWithDocument:self endHandler:^(NSInteger result, NSUInteger oldStart, NSUInteger newStart){
 		if (result == NSCancelButton) return;
 		
-		NSFetchRequest *allHigherPagesRequest = [[NSFetchRequest alloc] init];
-		[allHigherPagesRequest setEntity:[NSEntityDescription entityForName:@"Entry" inManagedObjectContext:[self managedObjectContext]]];
-		[allHigherPagesRequest setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"page" ascending:YES]]];
-		[allHigherPagesRequest setPredicate:[NSPredicate predicateWithFormat:@"page >= %@", [NSNumber numberWithUnsignedInteger:oldStart]]];
-		[allHigherPagesRequest setIncludesPropertyValues:YES];
-		[allHigherPagesRequest setIncludesPendingChanges:YES];
+		NSFetchRequest *allHigherPagesRequest = [NSFetchRequest fetchRequestWithEntityName:@"Entry"];
+		allHigherPagesRequest.sortDescriptors = @[ [NSSortDescriptor sortDescriptorWithKey:@"page" ascending:YES] ];
+		allHigherPagesRequest.predicate = [NSPredicate predicateWithFormat:@"page >= %lu", oldStart];
+		allHigherPagesRequest.includesPropertyValues = YES;
+		allHigherPagesRequest.includesPendingChanges = YES;
 		
 		NSError *error = nil;
-		NSArray *higherPages = [[self managedObjectContext] executeFetchRequest:allHigherPagesRequest error:&error];
+		NSArray *higherPages = [self.managedObjectContext executeFetchRequest:allHigherPagesRequest error:&error];
 		if (!higherPages)
 		{
 			[self presentError:error];
@@ -129,7 +127,7 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 		for (NSManagedObject *entry in higherPages)
 		{
 			NSUInteger oldPage = [[entry valueForKey:@"page"] unsignedIntegerValue];
-			[entry setValue:[NSNumber numberWithUnsignedInteger:oldPage + diff] forKey:@"page"];
+			[entry setValue:@(oldPage + diff) forKey:@"page"];
 		}
 	}];
 }
@@ -149,15 +147,15 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 		NSError *error = nil;
 		if (controller.exportMode == 1) // List
 		{
-			NSArray *sortDescriptors;
-			if (controller.includeDate)
-				sortDescriptors = [NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"enteredOn" ascending:NO]];
-			else
-				sortDescriptors = [NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"page" ascending:YES]];
+			NSArray *sortDescriptors = @[ controller.includeDate ? [NSSortDescriptor sortDescriptorWithKey:@"enteredOn" ascending:NO] : [NSSortDescriptor sortDescriptorWithKey:@"page" ascending:YES] ];
 			
-			NSDictionary *exportOptions = [NSDictionary dictionaryWithObjectsAndKeys:@"YES", ExporterOptionIncludeHeading, [NSNumber numberWithBool:controller.includeDate], ExporterOptionIncludeDate, [NSNumber numberWithBool:controller.includePage], ExporterOptionIncludePage, [NSNumber numberWithBool:controller.includeWord], ExporterOptionIncludeWord, nil];
+			NSDictionary *exportOptions = @{
+				ExporterOptionIncludeHeading : @(YES),
+				ExporterOptionIncludeDate : @(controller.includeDate),
+				ExporterOptionIncludePage : @(controller.includePage),
+				ExporterOptionIncludeWord : @(controller.includeWord)
+			};
 			
-			NSEntityDescription *description = [NSEntityDescription entityForName:@"Entry" inManagedObjectContext:[self managedObjectContext]];
 			NSMutableArray *includedProperties = [NSMutableArray arrayWithCapacity:3];
 			if (controller.includeDate)
 				[includedProperties addObject:@"enteredOn"];
@@ -166,14 +164,13 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 			if (controller.includePage)
 				[includedProperties addObject:@"page"];
 			
-			NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-			[fetchRequest setEntity:description];
-			[fetchRequest setIncludesPropertyValues:YES];
-			[fetchRequest setIncludesPendingChanges:YES];
-			[fetchRequest setRelationshipKeyPathsForPrefetching:includedProperties];
-			[fetchRequest setSortDescriptors:sortDescriptors];
+			NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"Entry"];
+			fetchRequest.includesPropertyValues = YES;
+			fetchRequest.includesPendingChanges = YES;
+			fetchRequest.relationshipKeyPathsForPrefetching = includedProperties;
+			fetchRequest.sortDescriptors = sortDescriptors;
 			
-			NSArray *entries = [[self managedObjectContext] executeFetchRequest:fetchRequest error:&error];
+			NSArray *entries = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
 			if (!entries)
 			{
 				[self presentError:error];
@@ -191,17 +188,14 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 								   ExporterOptionIncludeHeading : @(YES),
 		   ExporterOptionEmptyRowBeforeLetter : @(controller.emptyRowBeforeLetter)
 			};
+						
+			NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"Keyword"];
+			fetchRequest.includesPropertyValues = YES;
+			fetchRequest.includesPendingChanges = YES;
+			fetchRequest.relationshipKeyPathsForPrefetching = @[ @"usedOn" ];
+			fetchRequest.sortDescriptors = @[ [NSSortDescriptor sortDescriptorWithKey:@"word" ascending:YES selector:@selector(localizedCaseInsensitiveCompare:)] ];
 			
-			NSEntityDescription *description = [NSEntityDescription entityForName:@"Keyword" inManagedObjectContext:[self managedObjectContext]];
-			
-			NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-			[fetchRequest setEntity:description];
-			[fetchRequest setIncludesPropertyValues:YES];
-			[fetchRequest setIncludesPendingChanges:YES];
-			[fetchRequest setRelationshipKeyPathsForPrefetching:[NSArray arrayWithObject:@"usedOn"]];
-			[fetchRequest setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"word" ascending:YES selector:@selector(localizedCaseInsensitiveCompare:)]]];
-			
-			NSArray *keywords = [[self managedObjectContext] executeFetchRequest:fetchRequest error:&error];
+			NSArray *keywords = [self.managedObjectContext executeFetchRequest:fetchRequest error:&error];
 			if (!keywords)
 			{
 				[self presentError:error];
@@ -223,7 +217,7 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 		if (![documentData writeToURL:savePanel.URL options:NSDataWritingAtomic error:&error])
 			[self presentError:error];
 		
-		[[savePanel URL] setResourceValue:[NSNumber numberWithBool:[savePanel isExtensionHidden]] forKey:NSURLHasHiddenExtensionKey error:NULL];
+		[savePanel.URL setResourceValue:@(savePanel.isExtensionHidden) forKey:NSURLHasHiddenExtensionKey error:NULL];
 	}];
 }
 
@@ -233,16 +227,19 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 - (void)writeEntries:(NSArray *)items toPasteboard:(NSPasteboard *)pasteboard
 {
 	NSLog(@"writing %@ to pasteboard", items);
-	NSArray *pasteboardTypes = [NSArray arrayWithObjects:StichwoerterPboardType, NSPasteboardTypeTabularText, NSPasteboardTypeHTML, NSPasteboardTypeRTF, NSPasteboardTypeRTF, NSPasteboardTypeRTFD, NSPasteboardTypeString, nil];
+	NSArray *pasteboardTypes = @[ StichwoerterPboardType, NSPasteboardTypeTabularText, NSPasteboardTypeHTML, NSPasteboardTypeRTF, NSPasteboardTypeRTFD, NSPasteboardTypeString ];
 	[pasteboard declareTypes:pasteboardTypes owner:self];
 	
 	// Generate property list
-	NSMutableArray *propertyList = [NSMutableArray arrayWithCapacity:[items count]];
+	NSMutableArray *propertyList = [NSMutableArray arrayWithCapacity:items.count];
 	for (NSManagedObject *entry in items)
 	{
 		// Slightly strange format, but allows direct reading by HTML conversion methods.
-		NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:[entry valueForKey:@"enteredOn"], @"enteredOn", [entry valueForKey:@"page"], @"page", [NSDictionary dictionaryWithObject:[entry valueForKeyPath:@"word.word"] forKey:@"word"], @"word", nil];
-		[propertyList addObject:dict];
+		[propertyList addObject:@{
+		 @"enteredOn" : [entry valueForKey:@"enteredOn"],
+		 @"page" : [entry valueForKey:@"page"],
+		 @"word" : @{ @"word" : [entry valueForKeyPath:@"word.word"] }
+		 }];
 	}
 	
 	[pasteboard setPropertyList:propertyList forType:StichwoerterPboardType];
@@ -263,7 +260,12 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 	}
 	else if ([type isEqual:NSPasteboardTypeHTML] || [type isEqual:NSPasteboardTypeRTF] || [type isEqual:NSPasteboardTypeRTFD])
 	{
-		NSDictionary *exportOptions = [NSDictionary dictionaryWithObjectsAndKeys:@"NO", ExporterOptionIncludeHeading, @"YES", ExporterOptionIncludeDate, @"YES", ExporterOptionIncludeWord, @"YES", ExporterOptionIncludePage, nil];
+		NSDictionary *exportOptions = @{
+			ExporterOptionIncludeHeading: @(NO),
+			ExporterOptionIncludeDate: @(YES),
+			ExporterOptionIncludeWord: @(YES),
+			ExporterOptionIncludePage: @(YES)
+		};
 		NSData *htmlData = [KeywordExporter htmlDataForConvertingEntries:actualData options:exportOptions];
 		
 		if ([type isEqual:NSPasteboardTypeHTML])
@@ -277,12 +279,12 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 			
 			if ([type isEqual:NSPasteboardTypeRTF])
 			{
-				NSData *pboardData = [attributedString RTFFromRange:NSMakeRange(0, [attributedString length]) documentAttributes:nil];
+				NSData *pboardData = [attributedString RTFFromRange:NSMakeRange(0, attributedString.length) documentAttributes:nil];
 				[sender setData:pboardData forType:NSPasteboardTypeRTF];
 			}
 			else if ([type isEqual:NSPasteboardTypeRTFD])
 			{
-				NSData *pboardData = [attributedString RTFDFromRange:NSMakeRange(0, [attributedString length]) documentAttributes:nil];
+				NSData *pboardData = [attributedString RTFDFromRange:NSMakeRange(0, attributedString.length) documentAttributes:nil];
 				[sender setData:pboardData forType:NSPasteboardTypeRTF];
 			}
 		}
@@ -291,7 +293,7 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 
 - (void)readEntriesFromPasteboard:(NSPasteboard *)pasteboard
 {
-	NSArray *pasteboardTypes = [NSArray arrayWithObjects:StichwoerterPboardType, NSPasteboardTypeString, nil];
+	NSArray *pasteboardTypes = @[ StichwoerterPboardType, NSPasteboardTypeString ];
 	NSString *preferredType = [pasteboard availableTypeFromArray:pasteboardTypes];
 	if (!preferredType) return;
 	
@@ -336,15 +338,14 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 	NSArray *selectedEntries = [self _selectedEntries];
 	
 	for (NSManagedObject *object in selectedEntries)
-		[[self managedObjectContext] deleteObject:object];
+		[self.managedObjectContext deleteObject:object];
 	
-	NSFetchRequest *unusedWordsFetchRequest = [[NSFetchRequest alloc] init];
-	[unusedWordsFetchRequest setEntity:[NSEntityDescription entityForName:@"Keyword" inManagedObjectContext:[self managedObjectContext]]];
-	[unusedWordsFetchRequest setIncludesPendingChanges:YES];
-	[unusedWordsFetchRequest setPredicate:[NSPredicate predicateWithFormat:@"usedOn.@count == 0"]];
+	NSFetchRequest *unusedWordsFetchRequest = [NSFetchRequest fetchRequestWithEntityName:@"Keyword"];
+	unusedWordsFetchRequest.includesPendingChanges = YES;
+	unusedWordsFetchRequest.predicate = [NSPredicate predicateWithFormat:@"usedOn.@count == 0"];
 	
 	NSError *error;
-	NSArray *unusedWords = [[self managedObjectContext] executeFetchRequest:unusedWordsFetchRequest error:&error];
+	NSArray *unusedWords = [self.managedObjectContext executeFetchRequest:unusedWordsFetchRequest error:&error];
 	if (!unusedWords)
 	{
 		[self presentError:error];
@@ -352,7 +353,7 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 	}
 	
 	for (NSManagedObject *object in unusedWords)
-		[[self managedObjectContext] deleteObject:object];
+		[self.managedObjectContext deleteObject:object];
 }
 
 #pragma mark -
@@ -360,18 +361,18 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 
 - (NSArray *)_selectedEntries;
 {
-	if ([tabView indexOfTabViewItem:[tabView selectedTabViewItem]] == 0)
+	if ([tabView indexOfTabViewItem:tabView.selectedTabViewItem] == 0)
 	{
 		// Long list
-		return [keywordListController selectedObjects];
+		return keywordListController.selectedObjects;
 	}
 	else
 	{
 		// Directory list
-		if ([[dictionaryEntryListController selectedObjects] count] != 0)
+		if (dictionaryEntryListController.selectedObjects.count != 0)
 		{
 			// Single entries selected
-			return [dictionaryEntryListController selectedObjects];
+			return dictionaryEntryListController.selectedObjects;
 		}
 		else
 		{

@@ -37,7 +37,7 @@ static NSString *documentFilename = @"word/document.xml";
 	[relsRoot addChild:documentRelationship];
 	NSXMLDocument *rels = [[NSXMLDocument alloc] initWithRootElement:relsRoot];
 	rels.characterEncoding = @"UTF-8";
-	[rels setStandalone:YES];
+	rels.standalone = YES;
 	
 	[archive addFileNamed:relsFilename data:rels.XMLData];
 	
@@ -57,7 +57,7 @@ static NSString *documentFilename = @"word/document.xml";
 	
 	NSXMLDocument *contentTypes = [[NSXMLDocument alloc] initWithRootElement:contentTypesRoot];
 	contentTypes.characterEncoding = @"UTF-8";
-	[contentTypes setStandalone:YES];
+	contentTypes.standalone = YES;
 	
 	[archive addFileNamed:contentTypesFilename data:contentTypes.XMLData];
 	

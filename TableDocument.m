@@ -140,7 +140,7 @@ static NSString *wordprocessingNamespace = @"http://schemas.openxmlformats.org/w
 	// Prepare for writing
 	NSXMLDocument *document = [[NSXMLDocument alloc] initWithRootElement:root];
 	document.characterEncoding = @"UTF-8";
-	[document setStandalone:YES];
+	document.standalone = YES;
 	
 	// Create the whole stuff around it
 	SimpleWordprocessingMLFile *file = [[SimpleWordprocessingMLFile alloc] init];

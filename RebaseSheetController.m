@@ -28,21 +28,21 @@
 {
 	sheetEndHandler = [handler copy];
 	
-	[[NSApplication sharedApplication] beginSheet:[self window] modalForWindow:[document windowForSheet] modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
+	[[NSApplication sharedApplication] beginSheet:self.window modalForWindow:document.windowForSheet modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
 }
 
 - (IBAction)rebase:(id)sender;
 {
-	[[self window] orderOut:sender];
-	[[NSApplication sharedApplication] endSheet:[self window] returnCode:0];
+	[self.window orderOut:sender];
+	[[NSApplication sharedApplication] endSheet:self.window returnCode:0];
 	
 	sheetEndHandler(NSOKButton, self.oldStart, self.newStart);
 }
 
 - (IBAction)cancel:(id)sender;
 {
-	[[self window] orderOut:sender];
-	[[NSApplication sharedApplication] endSheet:[self window] returnCode:0];
+	[self.window orderOut:sender];
+	[[NSApplication sharedApplication] endSheet:self.window returnCode:0];
 	
 	sheetEndHandler(NSCancelButton, NSNotFound, NSNotFound);
 }

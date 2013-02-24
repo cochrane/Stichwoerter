@@ -43,11 +43,11 @@ NSString *ExporterOptionEmptyRowBeforeLetter = @"Empty Row before new letter";
 	NSManagedObjectModel *model = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
 	if (!model)
 	{
-		if (error) *error = [NSError errorWithDomain:@"de.ferroequinologist.stw.errordomain" code:-2 userInfo:[NSDictionary dictionaryWithObjectsAndKeys:storeURL, NSURLErrorKey, NSLocalizedString(@"Could not load Core Data model file", @"model not found"), NSLocalizedDescriptionKey, nil]];
+		if (error) *error = [NSError errorWithDomain:@"de.ferroequinologist.stw.errordomain" code:-2 userInfo:@{ NSURLErrorKey: storeURL, NSLocalizedDescriptionKey: NSLocalizedString(@"Could not load Core Data model file", @"model not found")}];
 		return nil;
 	}
 	
-	NSDictionary *readOnlyOptions = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:NSReadOnlyPersistentStoreOption];
+	NSDictionary *readOnlyOptions = @{ NSReadOnlyPersistentStoreOption : @(YES) };
 	
 	NSString *storeType = nil;
 	if ([contentTypeUTI isEqual:@"de.ferroequinologist.stw.bin"])
@@ -58,7 +58,7 @@ NSString *ExporterOptionEmptyRowBeforeLetter = @"Empty Row before new letter";
 		storeType = NSXMLStoreType;
 	else
 	{
-		if (error) *error = [NSError errorWithDomain:@"de.ferroequinologist.stw.errordomain" code:-3 userInfo:[NSDictionary dictionaryWithObjectsAndKeys:storeURL, NSURLErrorKey, [NSString stringWithFormat:NSLocalizedString(@"Type %@ can not be processed", @"wrong UTI type"), contentTypeUTI], NSLocalizedDescriptionKey, nil]];
+		if (error) *error = [NSError errorWithDomain:@"de.ferroequinologist.stw.errordomain" code:-3 userInfo:@{ NSURLErrorKey: storeURL, NSLocalizedDescriptionKey: [NSString stringWithFormat:NSLocalizedString(@"Type %@ can not be processed", @"wrong UTI type"), contentTypeUTI]}];
 		return nil;
 	}
 	
@@ -68,25 +68,16 @@ NSString *ExporterOptionEmptyRowBeforeLetter = @"Empty Row before new letter";
 		return nil;
     
 	NSManagedObjectContext *context = [[NSManagedObjectContext alloc] init];
-	[context setPersistentStoreCoordinator:coordinator];
+	context.persistentStoreCoordinator = coordinator;
 	
 	return context;
 }
 
 + (NSArray *)_entitiesNamed:(NSString *)name fromContext:(NSManagedObjectContext *)context sortDescriptors:(NSArray *)descriptors error:(NSError **)error;
 {
-	NSEntityDescription *description = [NSEntityDescription entityForName:name inManagedObjectContext:context];
-	if (!description)
-	{
-		if (error)
-			*error = [NSError errorWithDomain:@"de.ferroequinologist.stw.errordomain" code:-4 userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithFormat:NSLocalizedString(@"Entity type %@ does not exist", @"wrong entity name"), name], nil]];
-		return nil;
-	}
-	
-	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-	[fetchRequest setEntity:description];
-	[fetchRequest setReturnsObjectsAsFaults:NO];
-	[fetchRequest setSortDescriptors:descriptors];
+	NSFetchRequest *fetchRequest = [NSFetchRequest fetchRequestWithEntityName:name];
+	fetchRequest.returnsObjectsAsFaults = NO;
+	fetchRequest.sortDescriptors = descriptors;
 	
 	NSArray *result = [context executeFetchRequest:fetchRequest error:error];
 	
@@ -187,7 +178,7 @@ return document;
 		}
 		
 		
-		NSArray *sortedPages = [[keyword valueForKeyPath:@"usedOn.page"] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"self" ascending:YES]]];
+		NSArray *sortedPages = [[keyword valueForKeyPath:@"usedOn.page"] sortedArrayUsingDescriptors:@[ [NSSortDescriptor sortDescriptorWithKey:@"self" ascending:YES] ]];
 		
 		[document addLine:@[ word, [sortedPages componentsJoinedByString:separator]] ];
 	}

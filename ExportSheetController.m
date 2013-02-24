@@ -49,14 +49,15 @@ static NSString *ExportEmptyRowBeforeLetterKey = @"ExportEmptyRowBeforeLetter";
 	// Find documents directory
 	NSURL *url = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] objectAtIndex:0];
 	
-	NSDictionary *defaults = [NSDictionary dictionaryWithObjectsAndKeys:ExportDocFormatKey, ExportFormatKey,
-							  ExportDirectoryTypeKey, ExportTypeKey,
-							  [NSNumber numberWithBool:NO], ExportIncludesDateKey,
-							  [NSNumber numberWithBool:YES], ExportIncludesWordKey,
-							  [NSNumber numberWithBool:YES], ExportIncludesPageKey,
-							  [url absoluteString], ExportDirectoryURLKey,
-							  @(YES), ExportEmptyRowBeforeLetterKey,
-							  nil];
+	NSDictionary *defaults = @{
+		ExportFormatKey: ExportDocFormatKey,
+		ExportTypeKey : ExportDirectoryTypeKey,
+		ExportIncludesDateKey : @(NO),
+		ExportIncludesWordKey : @(YES),
+		ExportIncludesPageKey : @(YES),
+		ExportDirectoryURLKey : url.absoluteString,
+		ExportEmptyRowBeforeLetterKey : @(YES)
+	};
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 	self.includeDate = [[NSUserDefaults standardUserDefaults] boolForKey:ExportIncludesDateKey];
 	self.includeWord = [[NSUserDefaults standardUserDefaults] boolForKey:ExportIncludesWordKey];
@@ -81,36 +82,36 @@ static NSString *ExportEmptyRowBeforeLetterKey = @"ExportEmptyRowBeforeLetter";
 {
 	sheetEndBlock = [handler copy];
 	parentDocument = document;
-	parentWindow = [document windowForSheet];
-	[[NSApplication sharedApplication] beginSheet:[self window] modalForWindow:parentWindow modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
+	parentWindow = document.windowForSheet;
+	[[NSApplication sharedApplication] beginSheet:self.window modalForWindow:parentWindow modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
 }
 
 - (IBAction)cancel:(id)sender;
 {
-	[[self window] orderOut:sender];
+	[self.window orderOut:sender];
 	sheetEndBlock(NSCancelButton, nil);
 }
 
 - (IBAction)export:(id)sender;
 {
-	[[self window] orderOut:sender];
-	[[NSApplication sharedApplication] endSheet:[self window] returnCode:0];
+	[self.window orderOut:sender];
+	[[NSApplication sharedApplication] endSheet:self.window returnCode:0];
 	
 	NSSavePanel *savePanel = [NSSavePanel savePanel];
-	[savePanel setCanCreateDirectories:YES];
-	[savePanel setCanSelectHiddenExtension:YES];
-	[savePanel setPrompt:NSLocalizedString(@"Export", @"Prompt for export save panel")];
-	[savePanel setDirectoryURL:[[NSUserDefaults standardUserDefaults] URLForKey:ExportDirectoryURLKey]];
+	savePanel.canCreateDirectories = YES;
+	savePanel.canSelectHiddenExtension = YES;
+	savePanel.prompt = NSLocalizedString(@"Export", @"Prompt for export save panel");
+	savePanel.directoryURL = [[NSUserDefaults standardUserDefaults] URLForKey:ExportDirectoryURLKey];
 	
 	if (self.exportFormat == 1)
 	{
-		[savePanel setNameFieldStringValue:[[[parentDocument displayName] stringByDeletingPathExtension] stringByAppendingPathExtension:@"html"]];
-		[savePanel setAllowedFileTypes:[NSArray arrayWithObject:@"public.html"]];
+		savePanel.nameFieldStringValue = [parentDocument.displayName.stringByDeletingPathExtension stringByAppendingPathExtension:@"html"];
+		savePanel.allowedFileTypes = @[ @"public.html" ];
 	}
 	else
 	{
-		[savePanel setNameFieldStringValue:[[[parentDocument displayName] stringByDeletingPathExtension] stringByAppendingPathExtension:@"docx"]];
-		[savePanel setAllowedFileTypes:[NSArray arrayWithObject:@"org.openxmlformats.wordprocessingml.document"]];
+		savePanel.nameFieldStringValue = [parentDocument.displayName.stringByDeletingPathExtension stringByAppendingPathExtension:@"docx"];
+		savePanel.allowedFileTypes = @[ @"org.openxmlformats.wordprocessing.document" ];
 	}
 	
 	[savePanel beginSheetModalForWindow:parentWindow completionHandler:^(NSInteger result){
@@ -135,7 +136,7 @@ static NSString *ExportEmptyRowBeforeLetterKey = @"ExportEmptyRowBeforeLetter";
 		else 
 			[[NSUserDefaults standardUserDefaults] setObject:ExportDirectoryTypeKey forKey:ExportTypeKey];
 		
-		[[NSUserDefaults standardUserDefaults] setURL:[savePanel directoryURL] forKey:ExportDirectoryURLKey];
+		[[NSUserDefaults standardUserDefaults] setURL:savePanel.directoryURL forKey:ExportDirectoryURLKey];
 		sheetEndBlock(NSOKButton, savePanel);
 	}];
 }
