@@ -187,7 +187,10 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 		}
 		else // Directory
 		{
-			NSDictionary *exportOptions = [NSDictionary dictionaryWithObject:@"YES" forKey:ExporterOptionIncludeHeading];
+			NSDictionary *exportOptions = @{
+								   ExporterOptionIncludeHeading : @(YES),
+		   ExporterOptionEmptyRowBeforeLetter : @(controller.emptyRowBeforeLetter)
+			};
 			
 			NSEntityDescription *description = [NSEntityDescription entityForName:@"Keyword" inManagedObjectContext:[self managedObjectContext]];
 			

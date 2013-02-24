@@ -23,6 +23,7 @@ extern NSString *ExporterOptionIncludePage; // BOOL, Whether to include the page
 
 // Options only for converting keywords
 extern NSString *ExporterOptionPageNumberSeparator; // NSString, defaults to @", "
+extern NSString *ExporterOptionEmptyRowBeforeLetter; // BOOL, Whether to include an empty row before every new latter (except A), defaults to YES
 
 @interface KeywordExporter : NSObject
 {

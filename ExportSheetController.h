@@ -33,6 +33,8 @@
 @property (assign) BOOL includeWord;
 @property (assign) BOOL includePage;
 
+@property (assign) BOOL emptyRowBeforeLetter;
+
 - (IBAction)cancel:(id)sender;
 - (IBAction)export:(id)sender;
 

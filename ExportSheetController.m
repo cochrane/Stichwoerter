@@ -21,6 +21,8 @@ static NSString *ExportIncludesPageKey = @"ExportIncludesPage";
 
 static NSString *ExportDirectoryURLKey = @"ExportDirectoryURL";
 
+static NSString *ExportEmptyRowBeforeLetterKey = @"ExportEmptyRowBeforeLetter";
+
 @implementation ExportSheetController
 
 @synthesize exportFormat;
@@ -28,6 +30,7 @@ static NSString *ExportDirectoryURLKey = @"ExportDirectoryURL";
 @synthesize includeDate;
 @synthesize includeWord;
 @synthesize includePage;
+@synthesize emptyRowBeforeLetter;
 
 + (NSSet *)keyPathsForValuesAffectingFieldOptionsEnabled;
 {
@@ -52,12 +55,15 @@ static NSString *ExportDirectoryURLKey = @"ExportDirectoryURL";
 							  [NSNumber numberWithBool:YES], ExportIncludesWordKey,
 							  [NSNumber numberWithBool:YES], ExportIncludesPageKey,
 							  [url absoluteString], ExportDirectoryURLKey,
+							  @(YES), ExportEmptyRowBeforeLetterKey,
 							  nil];
 	[[NSUserDefaults standardUserDefaults] registerDefaults:defaults];
 	self.includeDate = [[NSUserDefaults standardUserDefaults] boolForKey:ExportIncludesDateKey];
 	self.includeWord = [[NSUserDefaults standardUserDefaults] boolForKey:ExportIncludesWordKey];
 	self.includePage = [[NSUserDefaults standardUserDefaults] boolForKey:ExportIncludesPageKey];
 
+	self.emptyRowBeforeLetter = [[NSUserDefaults standardUserDefaults] boolForKey:ExportEmptyRowBeforeLetterKey];
+	
 	if ([[[NSUserDefaults standardUserDefaults] stringForKey:ExportFormatKey] isEqual:ExportHTMLFormatKey])
 		self.exportFormat = 1;
 	else
@@ -117,6 +123,7 @@ static NSString *ExportDirectoryURLKey = @"ExportDirectoryURL";
 		[[NSUserDefaults standardUserDefaults] setBool:self.includeDate forKey:ExportIncludesDateKey];
 		[[NSUserDefaults standardUserDefaults] setBool:self.includeWord forKey:ExportIncludesWordKey];
 		[[NSUserDefaults standardUserDefaults] setBool:self.includePage forKey:ExportIncludesPageKey];
+		[[NSUserDefaults standardUserDefaults] setBool:self.emptyRowBeforeLetter forKey:ExportEmptyRowBeforeLetterKey];
 		
 		if (self.exportFormat == 1)
 			[[NSUserDefaults standardUserDefaults] setObject:ExportHTMLFormatKey forKey:ExportFormatKey];

@@ -22,6 +22,7 @@ NSString *ExporterOptionIncludePage = @"Page inclusion key";
 
 // Options only for converting keywords
 NSString *ExporterOptionPageNumberSeparator = @"Number separator key";
+NSString *ExporterOptionEmptyRowBeforeLetter = @"Empty Row before new letter";
 
 @interface KeywordExporter()
 
@@ -165,11 +166,30 @@ return document;
 	NSString *separator = [options objectForKey:ExporterOptionPageNumberSeparator];
 	if (!separator) separator = @", ";
 	
+	NSString *lastWord = nil;
+	BOOL emptyRowBeforeNewLetter = !options || ![options objectForKey:ExporterOptionEmptyRowBeforeLetter] || [[options objectForKey:ExporterOptionEmptyRowBeforeLetter] boolValue];
+	
 	for (id keyword in keywords)
 	{
+		NSString *word = [keyword valueForKeyPath:@"word"];
+		
+		if (emptyRowBeforeNewLetter && word.length > 0)
+		{
+			if (!lastWord) lastWord = word;
+			else
+			{
+				if ([lastWord compare:[word substringToIndex:1] options:NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch | NSWidthInsensitiveSearch range:NSMakeRange(0, 1) locale:[NSLocale currentLocale]] != NSOrderedSame)
+				{
+					[document addLine:@[ @"", @"" ]];
+					lastWord = word;
+				}
+			}
+		}
+		
+		
 		NSArray *sortedPages = [[keyword valueForKeyPath:@"usedOn.page"] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"self" ascending:YES]]];
 		
-		[document addLine:@[ [keyword valueForKeyPath:@"word"], [sortedPages componentsJoinedByString:separator]] ];
+		[document addLine:@[ word, [sortedPages componentsJoinedByString:separator]] ];
 	}
 	
 	return document;
