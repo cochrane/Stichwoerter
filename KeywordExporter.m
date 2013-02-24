@@ -177,10 +177,23 @@ return document;
 			}
 		}
 		
+		NSMutableIndexSet *pages = [NSMutableIndexSet indexSet];
+		for (NSNumber *number in [keyword valueForKeyPath:@"usedOn.page"])
+			[pages addIndex:number.unsignedIntegerValue];
 		
-		NSArray *sortedPages = [[keyword valueForKeyPath:@"usedOn.page"] sortedArrayUsingDescriptors:@[ [NSSortDescriptor sortDescriptorWithKey:@"self" ascending:YES] ]];
+		NSMutableArray *rangeStrings = [NSMutableArray array];
+		[pages enumerateRangesUsingBlock:^(NSRange range, BOOL *stop){
+			if (range.length == 1)
+				[rangeStrings addObject:[NSString stringWithFormat:NSLocalizedString(@"%lu", @"single number range"), range.location]];
+			else if (range.length == 2)
+				[rangeStrings addObject:[NSString stringWithFormat:NSLocalizedString(@"%luf", @"two numbers range"), range.location]];
+			else if (range.length == 3)
+				[rangeStrings addObject:[NSString stringWithFormat:NSLocalizedString(@"%luff", @"three numbers range"), range.location, NSMaxRange(range)]];
+			else
+				[rangeStrings addObject:[NSString stringWithFormat:NSLocalizedString(@"%lu–%lu", @"range with more than three items")]];
+		}];
 		
-		[document addLine:@[ word, [sortedPages componentsJoinedByString:separator]] ];
+		[document addLine:@[ word, [rangeStrings componentsJoinedByString:separator] ]];
 	}
 	
 	return document;
