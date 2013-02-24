@@ -36,6 +36,14 @@
 		5254600E16DA4F3D00919729 /* TableDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 5254600D16DA4F3D00919729 /* TableDocument.m */; };
 		5254601016DA54EB00919729 /* TableDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 5254600D16DA4F3D00919729 /* TableDocument.m */; };
 		5254601116DA54FA00919729 /* TableDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 5254600D16DA4F3D00919729 /* TableDocument.m */; };
+		5254601216DA627400919729 /* SimpleWordprocessingMLFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 52545FFF16D9951000919729 /* SimpleWordprocessingMLFile.m */; };
+		5254601316DA627400919729 /* ZIPArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 5254600516DA39B500919729 /* ZIPArchive.m */; };
+		5254601416DA627400919729 /* NSData+CRC32.m in Sources */ = {isa = PBXBuildFile; fileRef = 5254600816DA49FA00919729 /* NSData+CRC32.m */; };
+		5254601516DA627500919729 /* SimpleWordprocessingMLFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 52545FFF16D9951000919729 /* SimpleWordprocessingMLFile.m */; };
+		5254601616DA627500919729 /* ZIPArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 5254600516DA39B500919729 /* ZIPArchive.m */; };
+		5254601716DA627500919729 /* NSData+CRC32.m in Sources */ = {isa = PBXBuildFile; fileRef = 5254600816DA49FA00919729 /* NSData+CRC32.m */; };
+		5254601816DA628900919729 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5254600A16DA4AB700919729 /* libz.dylib */; };
+		5254601916DA628A00919729 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5254600A16DA4AB700919729 /* libz.dylib */; };
 		527883DC10664CFA00C69D6D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 527883DB10664CFA00C69D6D /* Localizable.strings */; };
 		527883EF10664D9800C69D6D /* ExportSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 527883EE10664D9800C69D6D /* ExportSheetController.m */; };
 		527883F310664DB600C69D6D /* ExportSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 527883F210664DB600C69D6D /* ExportSheet.xib */; };
@@ -146,6 +154,7 @@
 				514EA011081EC7AB009B8CD9 /* CoreData.framework in Frameworks */,
 				514EA010081EC7AA009B8CD9 /* Foundation.framework in Frameworks */,
 				514E9E2E081EC793009B8CD9 /* CoreServices.framework in Frameworks */,
+				5254601816DA628900919729 /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -156,6 +165,7 @@
 				52214696106994E5001D0D80 /* CoreData.framework in Frameworks */,
 				5221450310692B10001D0D80 /* Foundation.framework in Frameworks */,
 				522144C4106926E9001D0D80 /* QuickLook.framework in Frameworks */,
+				5254601916DA628A00919729 /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -174,6 +184,7 @@
 		1058C7A6FEA54F5311CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5254600A16DA4AB700919729 /* libz.dylib */,
 				522144C3106926E8001D0D80 /* QuickLook.framework */,
 				1058C7A7FEA54F5311CA2CBB /* Cocoa.framework */,
 				514EA014081EC7C3009B8CD9 /* CoreFoundation.framework */,
@@ -205,7 +216,6 @@
 		2A37F4AAFDCFA73011CA2CEA /* Stichwörter */ = {
 			isa = PBXGroup;
 			children = (
-				5254600A16DA4AB700919729 /* libz.dylib */,
 				E1B74B1A0667B4A90069E3BA /* Models */,
 				2A37F4ABFDCFA73011CA2CEA /* Classes */,
 				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
@@ -439,6 +449,9 @@
 				514E9E13081EC6B8009B8CD9 /* main.c in Sources */,
 				522145B7106966CB001D0D80 /* KeywordExporter.m in Sources */,
 				5254601116DA54FA00919729 /* TableDocument.m in Sources */,
+				5254601216DA627400919729 /* SimpleWordprocessingMLFile.m in Sources */,
+				5254601316DA627400919729 /* ZIPArchive.m in Sources */,
+				5254601416DA627400919729 /* NSData+CRC32.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -451,6 +464,9 @@
 				522144D9106927AC001D0D80 /* GenerateThumbnailForURL.m in Sources */,
 				522145B6106966CB001D0D80 /* KeywordExporter.m in Sources */,
 				5254601016DA54EB00919729 /* TableDocument.m in Sources */,
+				5254601516DA627500919729 /* SimpleWordprocessingMLFile.m in Sources */,
+				5254601616DA627500919729 /* ZIPArchive.m in Sources */,
+				5254601716DA627500919729 /* NSData+CRC32.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
