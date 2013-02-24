@@ -94,6 +94,8 @@ const uint8_t ZipEndOfCentralDirectoryRecordSignature[4] = { 0x50, 0x4b,0x05, 0x
 	for (NSString *filename in self.files)
 	{
 		NSData *fileData = [self.files objectForKey:filename];
+		NSData *compressed = fileData.rawDeflatedData;
+		BOOL isCompressed = compressed.length < fileData.length;
 		uint32_t crc32 = fileData.crc32;
 		
 		// Convert file name to UTF-8
@@ -107,12 +109,12 @@ const uint8_t ZipEndOfCentralDirectoryRecordSignature[4] = { 0x50, 0x4b,0x05, 0x
 		struct ZipLocalFileHeader *localHeader = calloc(1, localHeaderLength);
 		memcpy(localHeader->signature, ZipLocalFileHeaderSignature, 4);
 		localHeader->versionNeededToExtract = 20; // Default
-		localHeader->generalPurposeBitFlag = 0; // No feature
-		localHeader->compressionMethod = 0; // No compression
+		localHeader->generalPurposeBitFlag = isCompressed ? 6 : 0; // Max compression
+		localHeader->compressionMethod = isCompressed ? 8 : 0; // Deflate
 		localHeader->lastModFileTime = 0; // No date set
 		localHeader->lastModFileDate = 0; // No date set
 		localHeader->crc32 = crc32;
-		localHeader->compressedSize = (uint32_t) fileData.length;
+		localHeader->compressedSize = (uint32_t) (isCompressed ? compressed.length : fileData.length);
 		localHeader->uncompressedSize = (uint32_t) fileData.length;
 		localHeader->fileNameLength = (uint16_t) actualNameLength;
 		localHeader->extraFieldLength = 0; // No extra field
@@ -124,12 +126,12 @@ const uint8_t ZipEndOfCentralDirectoryRecordSignature[4] = { 0x50, 0x4b,0x05, 0x
 		memcpy(centralDirectoryHeader->signature, ZipCentralDirectoryFileHeaderSignature, 4);
 		centralDirectoryHeader->versionMadeBy = (45 << 8) | 19; // Version 4.5, which is what Word uses. On Mac OS X
 		centralDirectoryHeader->versionNeededToExtract = 20; // Default
-		centralDirectoryHeader->generalPurposeBitFlag = 0; // No feature
-		centralDirectoryHeader->compressionMethod = 0; // No compression
+		centralDirectoryHeader->generalPurposeBitFlag = isCompressed ? 6 : 0; // Max compression
+		centralDirectoryHeader->compressionMethod = isCompressed ? 8 : 0; // Deflate
 		centralDirectoryHeader->lastModFileTime = 0; // No date set
 		centralDirectoryHeader->lastModFileDate = 0; // No date set
 		centralDirectoryHeader->crc32 = crc32;
-		centralDirectoryHeader->compressedSize = (uint32_t) fileData.length;
+		centralDirectoryHeader->compressedSize = (uint32_t) (isCompressed ? compressed.length : fileData.length);
 		centralDirectoryHeader->uncompressedSize = (uint32_t) fileData.length;
 		centralDirectoryHeader->fileNameLength = (uint16_t) actualNameLength;
 		centralDirectoryHeader->extraFieldLnegth = 0; // No extra field
@@ -142,7 +144,7 @@ const uint8_t ZipEndOfCentralDirectoryRecordSignature[4] = { 0x50, 0x4b,0x05, 0x
 		
 		// Append data
 		[archiveData appendBytes:localHeader length:localHeaderLength];
-		[archiveData appendData:fileData];
+		[archiveData appendData:isCompressed ? compressed : fileData];
 		[centralDirectory appendBytes:centralDirectoryHeader length:centralDirectoryHeaderLength];
 		
 		// Cleanup

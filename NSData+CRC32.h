@@ -11,5 +11,6 @@
 @interface NSData (CRC32)
 
 - (uint32_t)crc32;
+- (NSData *)rawDeflatedData;
 
 @end
