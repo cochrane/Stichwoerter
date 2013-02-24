@@ -105,13 +105,13 @@ static NSString *ExportEmptyRowBeforeLetterKey = @"ExportEmptyRowBeforeLetter";
 	
 	if (self.exportFormat == 1)
 	{
-		savePanel.nameFieldStringValue = [parentDocument.displayName.stringByDeletingPathExtension stringByAppendingPathExtension:@"html"];
 		savePanel.allowedFileTypes = @[ @"public.html" ];
+		savePanel.nameFieldStringValue = [parentDocument.displayName.stringByDeletingPathExtension stringByAppendingPathExtension:@"html"];
 	}
 	else
 	{
+		savePanel.allowedFileTypes = @[ @"org.openxmlformats.wordprocessingml.document" ];
 		savePanel.nameFieldStringValue = [parentDocument.displayName.stringByDeletingPathExtension stringByAppendingPathExtension:@"docx"];
-		savePanel.allowedFileTypes = @[ @"org.openxmlformats.wordprocessing.document" ];
 	}
 	
 	[savePanel beginSheetModalForWindow:parentWindow completionHandler:^(NSInteger result){
