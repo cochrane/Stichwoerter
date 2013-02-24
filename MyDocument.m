@@ -83,7 +83,6 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 	[fetchRequest setPredicate:[NSPredicate predicateWithFormat:@"word = %@", word]];
 	
 	NSArray *result = [[self managedObjectContext] executeFetchRequest:fetchRequest error:NULL];
-	[fetchRequest release];
 	
 	NSManagedObject *keyword = nil;
 	if ([result count] == 0)
@@ -108,7 +107,6 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 {
 	RebaseSheetController *controller = [[RebaseSheetController alloc] init];
 	[controller runWithDocument:self endHandler:^(NSInteger result, NSUInteger oldStart, NSUInteger newStart){
-		[controller release];
 		if (result == NSCancelButton) return;
 		
 		NSFetchRequest *allHigherPagesRequest = [[NSFetchRequest alloc] init];
@@ -120,7 +118,6 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 		
 		NSError *error = nil;
 		NSArray *higherPages = [[self managedObjectContext] executeFetchRequest:allHigherPagesRequest error:&error];
-		[allHigherPagesRequest release];
 		if (!higherPages)
 		{
 			[self presentError:error];
@@ -146,10 +143,7 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 	ExportSheetController *controller = [[ExportSheetController alloc] init];
 	[controller runWithDocument:self endHandler:^(NSInteger result, NSSavePanel *savePanel) {
 		if (result == NSCancelButton)
-		{
-			[controller release];
 			return;
-		}
 		
 		NSString *htmlSourceCode = nil;
 		NSError *error = nil;
@@ -180,7 +174,6 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 			[fetchRequest setSortDescriptors:sortDescriptors];
 			
 			NSArray *entries = [[self managedObjectContext] executeFetchRequest:fetchRequest error:&error];
-			[fetchRequest release];
 			if (!entries)
 			{
 				[self presentError:error];
@@ -203,19 +196,18 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 			[fetchRequest setSortDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"word" ascending:YES selector:@selector(localizedCaseInsensitiveCompare:)]]];
 			
 			NSArray *keywords = [[self managedObjectContext] executeFetchRequest:fetchRequest error:&error];
-			[fetchRequest release];
 			if (!keywords)
 			{
 				[self presentError:error];
 				return;
 			}
 			
-			htmlSourceCode = [KeywordExporter htmlCodeForConvertingKeywords:keywords options:exportOptions];
+			NSData *htmlData = [KeywordExporter htmlCodeForConvertingKeywords:keywords options:exportOptions];
+			htmlSourceCode = [[NSString alloc] initWithBytes:htmlData.bytes length:htmlData.length encoding:NSUTF8StringEncoding];
 		}
 		
 		if (!htmlSourceCode)
 		{
-			[controller release];
 			[self presentError:error];
 			return;
 		}
@@ -223,7 +215,6 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 		{
 			// HTML. Write it to disk directly.
 			BOOL result = [htmlSourceCode writeToURL:[savePanel URL] atomically:YES encoding:NSUTF8StringEncoding error:&error];
-			[controller release];
 			
 			if (!result) [self presentError:error];
 		}
@@ -235,9 +226,7 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 			NSAttributedString *attributedString = [[NSAttributedString alloc] initWithHTML:utf8HTMLData documentAttributes:NULL];
 			
 			NSData *docData = [attributedString docFormatFromRange:NSMakeRange(0, [attributedString length]) documentAttributes:nil];
-			[attributedString release];
 			[docData writeToURL:[savePanel URL] atomically:YES];
-			[controller release];
 		}
 		[[savePanel URL] setResourceValue:[NSNumber numberWithBool:[savePanel isExtensionHidden]] forKey:NSURLHasHiddenExtensionKey error:NULL];
 	}];
@@ -299,7 +288,6 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 				NSData *pboardData = [attributedString RTFDFromRange:NSMakeRange(0, [attributedString length]) documentAttributes:nil];
 				[sender setData:pboardData forType:NSPasteboardTypeRTF];
 			}
-			[attributedString release];
 		}
 	}
 }
@@ -360,7 +348,6 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 	
 	NSError *error;
 	NSArray *unusedWords = [[self managedObjectContext] executeFetchRequest:unusedWordsFetchRequest error:&error];
-	[unusedWordsFetchRequest release];
 	if (!unusedWords)
 	{
 		[self presentError:error];

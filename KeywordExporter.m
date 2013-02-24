@@ -8,6 +8,8 @@
 
 #import "KeywordExporter.h"
 
+#import "TableDocument.h"
+
 // Options for both
 NSString *ExporterOptionIncludeHeading = @"Include heading key";
 NSString *ExporterOptionCSSFileName = @"CSS file name key";
@@ -53,25 +55,19 @@ NSString *ExporterOptionPageNumberSeparator = @"Number separator key";
 		storeType = NSXMLStoreType;
 	else
 	{
-		[model release];
 		if (error) *error = [NSError errorWithDomain:@"de.ferroequinologist.stw.errordomain" code:-3 userInfo:[NSDictionary dictionaryWithObjectsAndKeys:storeURL, NSURLErrorKey, [NSString stringWithFormat:NSLocalizedString(@"Type %@ can not be processed", @"wrong UTI type"), contentTypeUTI], NSLocalizedDescriptionKey, nil]];
 		return nil;
 	}
 	
 	NSPersistentStoreCoordinator *coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:model];
-	[model release];
 	
 	if (![coordinator addPersistentStoreWithType:storeType configuration:nil URL:storeURL options:readOnlyOptions error:error])
-	{
-		[coordinator release];
 		return nil;
-	}
     
 	NSManagedObjectContext *context = [[NSManagedObjectContext alloc] init];
 	[context setPersistentStoreCoordinator:coordinator];
-	[coordinator release];
 	
-	return [context autorelease];
+	return context;
 }
 
 + (NSArray *)_entitiesNamed:(NSString *)name fromContext:(NSManagedObjectContext *)context sortDescriptors:(NSArray *)descriptors error:(NSError **)error;
@@ -90,7 +86,6 @@ NSString *ExporterOptionPageNumberSeparator = @"Number separator key";
 	[fetchRequest setSortDescriptors:descriptors];
 	
 	NSArray *result = [context executeFetchRequest:fetchRequest error:error];
-	[fetchRequest release];
 	
 	return result;
 }
@@ -144,27 +139,24 @@ NSString *ExporterOptionPageNumberSeparator = @"Number separator key";
 	for (id entry in entries)
 	{
 		[resultString appendString:@"<tr>"];
-		if (includeDate) [resultString appendFormat:@"<td>%@</td>", [entry valueForKey:@"enteredOn"]];
-		if (includeWord) [resultString appendFormat:@"<td>%@</td>", [entry valueForKey:@"word.word"]];
-		if (includePage) [resultString appendFormat:@"<td>%@</td>", [entry valueForKey:@"page"]];
+		if (includeDate) [resultString appendFormat:@"<td>%@</td>", [entry valueForKeyPath:@"enteredOn"]];
+		if (includeWord) [resultString appendFormat:@"<td>%@</td>", [entry valueForKeyPath:@"word.word"]];
+		if (includePage) [resultString appendFormat:@"<td>%@</td>", [entry valueForKeyPath:@"page"]];
 		[resultString appendString:@"</tr>"];
 	}
 	
 	[resultString appendString:@"</table></body></html>"];
 	
-	return [[resultString copy] autorelease];
+	return [resultString copy];
 }
 
-+ (NSString *)htmlCodeForConvertingKeywords:(NSArray *)keywords options:(NSDictionary *)options;
++ (NSData *)htmlCodeForConvertingKeywords:(NSArray *)keywords options:(NSDictionary *)options;
 {
-	NSMutableString *resultString = [self _createBeginningWithOptions:options];
+	TableDocument *document = [[TableDocument alloc] init];
 	
 	if (!options || ![options objectForKey:ExporterOptionIncludeHeading] || [[options objectForKey:ExporterOptionIncludeHeading] boolValue])
 	{
-		[resultString appendString:@"<tr>"];
-		[resultString appendFormat:@"<th>%@</th>", NSLocalizedString(@"Keyword", @"Export keyword header")];
-		[resultString appendFormat:@"<th>%@</th>", NSLocalizedString(@"On Pages", @"Export page list header")];
-		[resultString appendString:@"</tr>"];
+		document.headers = @[ NSLocalizedString(@"Keyword", @"Export keyword header"), NSLocalizedString(@"On Pages", @"Export page list header") ];
 	}
 	
 	NSString *separator = [options objectForKey:ExporterOptionPageNumberSeparator];
@@ -172,17 +164,12 @@ NSString *ExporterOptionPageNumberSeparator = @"Number separator key";
 	
 	for (id keyword in keywords)
 	{
-		[resultString appendFormat:@"<tr><td>%@</td>", [keyword valueForKey:@"word"]];
-		
 		NSArray *sortedPages = [[keyword valueForKeyPath:@"usedOn.page"] sortedArrayUsingDescriptors:[NSArray arrayWithObject:[NSSortDescriptor sortDescriptorWithKey:@"self" ascending:YES]]];
-		[resultString appendFormat:@"<td>%@</td>", [sortedPages componentsJoinedByString:separator]];
 		
-		[resultString appendString:@"</tr>"];
+		[document addLine:@[ [keyword valueForKeyPath:@"word"], [sortedPages componentsJoinedByString:separator]] ];
 	}
 	
-	[resultString appendString:@"</table></body></html>"];
-	
-	return [[resultString copy] autorelease];
+	return [document htmlRepresentation];
 }
 
 @end

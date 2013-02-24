@@ -41,11 +41,7 @@ static NSString *ExportDirectoryURLKey = @"ExportDirectoryURL";
 
 - (id)init
 {
-	if ((self = [super initWithWindowNibName:@"ExportSheet"]) == nil)
-	{
-		[self release];
-		return nil;
-	}
+	if ((self = [super initWithWindowNibName:@"ExportSheet"]) == nil) return nil;
 	
 	// Find documents directory
 	NSURL *url = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] objectAtIndex:0];
@@ -78,7 +74,7 @@ static NSString *ExportDirectoryURLKey = @"ExportDirectoryURL";
 - (void)runWithDocument:(NSDocument *)document endHandler:(void (^)(NSInteger, NSSavePanel *))handler;
 {
 	sheetEndBlock = [handler copy];
-	parentDocument = [document retain];
+	parentDocument = document;
 	parentWindow = [document windowForSheet];
 	[[NSApplication sharedApplication] beginSheet:[self window] modalForWindow:parentWindow modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
 }
@@ -86,8 +82,6 @@ static NSString *ExportDirectoryURLKey = @"ExportDirectoryURL";
 - (IBAction)cancel:(id)sender;
 {
 	[[self window] orderOut:sender];
-	[parentDocument release];
-	[sheetEndBlock autorelease];
 	sheetEndBlock(NSCancelButton, nil);
 }
 
@@ -116,8 +110,6 @@ static NSString *ExportDirectoryURLKey = @"ExportDirectoryURL";
 	[savePanel beginSheetModalForWindow:parentWindow completionHandler:^(NSInteger result){
 		if (result == NSCancelButton)
 		{
-			[parentDocument release];
-			[sheetEndBlock autorelease];
 			sheetEndBlock(NSCancelButton, nil);
 			return;
 		}
@@ -137,9 +129,6 @@ static NSString *ExportDirectoryURLKey = @"ExportDirectoryURL";
 			[[NSUserDefaults standardUserDefaults] setObject:ExportDirectoryTypeKey forKey:ExportTypeKey];
 		
 		[[NSUserDefaults standardUserDefaults] setURL:[savePanel directoryURL] forKey:ExportDirectoryURLKey];
-		
-		[parentDocument release];
-		[sheetEndBlock autorelease];
 		sheetEndBlock(NSOKButton, savePanel);
 	}];
 }

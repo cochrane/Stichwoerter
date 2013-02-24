@@ -16,11 +16,7 @@
 
 - (id)init
 {
-	if ((self = [super initWithWindowNibName:@"RebaseSheet"]) == nil)
-	{
-		[self release];
-		return nil;
-	}
+	if ((self = [super initWithWindowNibName:@"RebaseSheet"]) == nil) return nil;
 	
 	self.oldStart = 1;
 	self.newStart = 1;
@@ -40,7 +36,6 @@
 	[[self window] orderOut:sender];
 	[[NSApplication sharedApplication] endSheet:[self window] returnCode:0];
 	
-	[sheetEndHandler autorelease];
 	sheetEndHandler(NSOKButton, self.oldStart, self.newStart);
 }
 
@@ -49,7 +44,6 @@
 	[[self window] orderOut:sender];
 	[[NSApplication sharedApplication] endSheet:[self window] returnCode:0];
 	
-	[sheetEndHandler autorelease];
 	sheetEndHandler(NSCancelButton, NSNotFound, NSNotFound);
 }
 

@@ -29,6 +29,13 @@
 		52214715106998E6001D0D80 /* Stichwörter.qlgenerator in CopyFiles */ = {isa = PBXBuildFile; fileRef = 522144BD106926BB001D0D80 /* Stichwörter.qlgenerator */; };
 		522CC07D108BBAF300EB5DF6 /* RebaseSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 522CC07C108BBAF300EB5DF6 /* RebaseSheetController.m */; };
 		522CC085108BBD0D00EB5DF6 /* RebaseSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 522CC084108BBD0D00EB5DF6 /* RebaseSheet.xib */; };
+		5254600016D9951000919729 /* SimpleWordprocessingMLFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 52545FFF16D9951000919729 /* SimpleWordprocessingMLFile.m */; };
+		5254600616DA39B500919729 /* ZIPArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 5254600516DA39B500919729 /* ZIPArchive.m */; };
+		5254600916DA49FA00919729 /* NSData+CRC32.m in Sources */ = {isa = PBXBuildFile; fileRef = 5254600816DA49FA00919729 /* NSData+CRC32.m */; };
+		5254600B16DA4AB700919729 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5254600A16DA4AB700919729 /* libz.dylib */; };
+		5254600E16DA4F3D00919729 /* TableDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 5254600D16DA4F3D00919729 /* TableDocument.m */; };
+		5254601016DA54EB00919729 /* TableDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 5254600D16DA4F3D00919729 /* TableDocument.m */; };
+		5254601116DA54FA00919729 /* TableDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 5254600D16DA4F3D00919729 /* TableDocument.m */; };
 		527883DC10664CFA00C69D6D /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 527883DB10664CFA00C69D6D /* Localizable.strings */; };
 		527883EF10664D9800C69D6D /* ExportSheetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 527883EE10664D9800C69D6D /* ExportSheetController.m */; };
 		527883F310664DB600C69D6D /* ExportSheet.xib in Resources */ = {isa = PBXBuildFile; fileRef = 527883F210664DB600C69D6D /* ExportSheet.xib */; };
@@ -107,6 +114,15 @@
 		522CC07B108BBAF300EB5DF6 /* RebaseSheetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RebaseSheetController.h; sourceTree = "<group>"; };
 		522CC07C108BBAF300EB5DF6 /* RebaseSheetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RebaseSheetController.m; sourceTree = "<group>"; };
 		522CC086108BBD1300EB5DF6 /* German */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = German; path = German.lproj/RebaseSheet.xib; sourceTree = "<group>"; };
+		52545FFE16D9951000919729 /* SimpleWordprocessingMLFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleWordprocessingMLFile.h; sourceTree = "<group>"; };
+		52545FFF16D9951000919729 /* SimpleWordprocessingMLFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimpleWordprocessingMLFile.m; sourceTree = "<group>"; };
+		5254600416DA39B500919729 /* ZIPArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZIPArchive.h; sourceTree = "<group>"; };
+		5254600516DA39B500919729 /* ZIPArchive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZIPArchive.m; sourceTree = "<group>"; };
+		5254600716DA49FA00919729 /* NSData+CRC32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+CRC32.h"; sourceTree = "<group>"; };
+		5254600816DA49FA00919729 /* NSData+CRC32.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+CRC32.m"; sourceTree = "<group>"; };
+		5254600A16DA4AB700919729 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		5254600C16DA4F3D00919729 /* TableDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TableDocument.h; sourceTree = "<group>"; };
+		5254600D16DA4F3D00919729 /* TableDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TableDocument.m; sourceTree = "<group>"; };
 		527883DD10664D0300C69D6D /* German */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = German; path = German.lproj/Localizable.strings; sourceTree = "<group>"; };
 		527883ED10664D9800C69D6D /* ExportSheetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExportSheetController.h; sourceTree = "<group>"; };
 		527883EE10664D9800C69D6D /* ExportSheetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExportSheetController.m; sourceTree = "<group>"; };
@@ -147,6 +163,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5254600B16DA4AB700919729 /* libz.dylib in Frameworks */,
 				775DFF38067A968500C5B868 /* Cocoa.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -188,6 +205,7 @@
 		2A37F4AAFDCFA73011CA2CEA /* Stichwörter */ = {
 			isa = PBXGroup;
 			children = (
+				5254600A16DA4AB700919729 /* libz.dylib */,
 				E1B74B1A0667B4A90069E3BA /* Models */,
 				2A37F4ABFDCFA73011CA2CEA /* Classes */,
 				2A37F4AFFDCFA73011CA2CEA /* Other Sources */,
@@ -212,6 +230,14 @@
 				522145B5106966CB001D0D80 /* KeywordExporter.m */,
 				522CC07B108BBAF300EB5DF6 /* RebaseSheetController.h */,
 				522CC07C108BBAF300EB5DF6 /* RebaseSheetController.m */,
+				52545FFE16D9951000919729 /* SimpleWordprocessingMLFile.h */,
+				52545FFF16D9951000919729 /* SimpleWordprocessingMLFile.m */,
+				5254600416DA39B500919729 /* ZIPArchive.h */,
+				5254600516DA39B500919729 /* ZIPArchive.m */,
+				5254600716DA49FA00919729 /* NSData+CRC32.h */,
+				5254600816DA49FA00919729 /* NSData+CRC32.m */,
+				5254600C16DA4F3D00919729 /* TableDocument.h */,
+				5254600D16DA4F3D00919729 /* TableDocument.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -352,7 +378,7 @@
 		2A37F4A9FDCFA73011CA2CEA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0420;
+				LastUpgradeCheck = 0450;
 			};
 			buildConfigurationList = 26FC0ACE0875C91100E6366F /* Build configuration list for PBXProject "Stichwörter" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -412,6 +438,7 @@
 				514E9E12081EC6B8009B8CD9 /* GetMetadataForFile.m in Sources */,
 				514E9E13081EC6B8009B8CD9 /* main.c in Sources */,
 				522145B7106966CB001D0D80 /* KeywordExporter.m in Sources */,
+				5254601116DA54FA00919729 /* TableDocument.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -423,6 +450,7 @@
 				522144D8106927AC001D0D80 /* GeneratePreviewForURL.m in Sources */,
 				522144D9106927AC001D0D80 /* GenerateThumbnailForURL.m in Sources */,
 				522145B6106966CB001D0D80 /* KeywordExporter.m in Sources */,
+				5254601016DA54EB00919729 /* TableDocument.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -436,6 +464,10 @@
 				527883EF10664D9800C69D6D /* ExportSheetController.m in Sources */,
 				522145D510696E00001D0D80 /* KeywordExporter.m in Sources */,
 				522CC07D108BBAF300EB5DF6 /* RebaseSheetController.m in Sources */,
+				5254600016D9951000919729 /* SimpleWordprocessingMLFile.m in Sources */,
+				5254600616DA39B500919729 /* ZIPArchive.m in Sources */,
+				5254600916DA49FA00919729 /* NSData+CRC32.m in Sources */,
+				5254600E16DA4F3D00919729 /* TableDocument.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -518,6 +550,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_MODEL_TUNING = G5;
@@ -535,6 +568,7 @@
 		26FC0AC80875C91100E6366F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
@@ -551,6 +585,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -568,6 +603,7 @@
 		26FC0ACC0875C91100E6366F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_MODEL_TUNING = G5;
@@ -584,6 +620,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "Developer ID Application: Torsten Kammer";
 				GCC_AUTO_VECTORIZATION = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_FAST_MATH = YES;
@@ -594,7 +632,8 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "";
-				SDKROOT = macosx10.7;
+				PROVISIONING_PROFILE = "";
+				SDKROOT = macosx;
 				VALID_ARCHS = "i386 x86_64";
 				WARNING_CFLAGS = "-Wall";
 			};
@@ -604,6 +643,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_IDENTITY = "Developer ID Application: Torsten Kammer";
 				GCC_AUTO_VECTORIZATION = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_FAST_MATH = YES;
@@ -614,7 +655,8 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.6;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "";
-				SDKROOT = macosx10.7;
+				PROVISIONING_PROFILE = "";
+				SDKROOT = macosx;
 				VALID_ARCHS = "i386 x86_64";
 				WARNING_CFLAGS = "-Wall";
 			};
@@ -624,6 +666,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_MODEL_TUNING = "";
@@ -647,6 +690,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_MODEL_TUNING = "";

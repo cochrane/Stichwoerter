@@ -31,36 +31,30 @@ Boolean GetMetadataForFile(void* thisInterface,
     /* Return the attribute keys and attribute values in the dict */
     /* Return TRUE if successful, FALSE if there was no data provided */
 
-    NSAutoreleasePool *pool  = [[NSAutoreleasePool alloc] init];
-    NSError *error = nil;
-	
-	CFBundleRef myBundle = CFBundleGetBundleWithIdentifier((CFStringRef) @"de.ferroequinologist.Stichw-rter.spotlightimporter");
-	CFURLRef bundleURL = CFBundleCopyBundleURL(myBundle);
-	
-	NSURL *modelURL = [NSURL URLWithString:@"../../../Resources/MyDocument.mom" relativeToURL:(NSURL *) bundleURL];
-	
-	CFRelease(bundleURL);
-	
-	NSURL *fileURL = [NSURL fileURLWithPath:(NSString *)pathToFile];
-	
-	NSManagedObjectContext *context = [KeywordExporter contextForURL:fileURL UTI:(NSString *) contentTypeUTI managedObjectModelLocation:modelURL error:&error];
-	if (error != NULL)
-	{
-		[pool drain];
-		return FALSE;
+	@autoreleasepool {
+		NSError *error = nil;
+		
+		CFBundleRef myBundle = CFBundleGetBundleWithIdentifier((CFStringRef) @"de.ferroequinologist.Stichw-rter.spotlightimporter");
+		CFURLRef bundleURL = CFBundleCopyBundleURL(myBundle);
+		
+		NSURL *modelURL = [NSURL URLWithString:@"../../../Resources/MyDocument.mom" relativeToURL:(__bridge NSURL *) bundleURL];
+		
+		CFRelease(bundleURL);
+		
+		NSURL *fileURL = [NSURL fileURLWithPath:(__bridge NSString *)pathToFile];
+		
+		NSManagedObjectContext *context = [KeywordExporter contextForURL:fileURL UTI:(__bridge NSString *) contentTypeUTI managedObjectModelLocation:modelURL error:&error];
+		if (error != NULL)
+			return FALSE;
+		
+		NSArray *entries = [KeywordExporter keywordsFromContext:context sortDescriptors:nil error:&error];
+		if (error != NULL)
+			return FALSE;
+		
+		NSString *textContent = [[entries valueForKey:@"word"] componentsJoinedByString:@"\n"];
+		[(__bridge NSMutableDictionary *) attributes setObject:textContent forKey:(NSString *) kMDItemTextContent];
+		
+		// Return the status
+		return TRUE;
 	}
-	
-	NSArray *entries = [KeywordExporter keywordsFromContext:context sortDescriptors:nil error:&error];
-	if (error != NULL)
-	{
-		[pool drain];
-		return FALSE;
-	}
-	
-	NSString *textContent = [[entries valueForKey:@"word"] componentsJoinedByString:@"\n"];
-	[(NSMutableDictionary *) attributes setObject:textContent forKey:(NSString *) kMDItemTextContent];
-	
-	// Return the status
-    [pool drain];
-    return TRUE;
 }
