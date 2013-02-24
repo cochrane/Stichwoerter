@@ -24,7 +24,7 @@ struct ZipLocalFileHeader
 	uint16_t fileNameLength;
 	uint16_t extraFieldLength;
 	uint8_t filename[];
-};
+} __attribute((packed));
 
 struct ZipCentralDirectoryFileHeader
 {
@@ -46,18 +46,19 @@ struct ZipCentralDirectoryFileHeader
 	uint32_t externalFileAttributes;
 	uint32_t relativeOffsetOfLocalHeader;
 	uint8_t filename[];
-};
+} __attribute((packed));
 
 struct ZipEndOfCentralDirectoryRecord
 {
 	uint8_t signature[4];
 	uint16_t numberOfThisDisk;
 	uint16_t numberOfDiskWithStartOfCentralDirectory;
+	uint16_t numberOfEntriesInCentralDirectoryOnThisDisk;
 	uint16_t numberOfEntriesInCentralDirectory;
 	uint32_t sizeOfCentralDirectory;
 	uint32_t offsetOfStartOfCentralDirectoryWithRespectToStartingDiskNumber;
 	uint16_t commentLength;
-};
+} __attribute((packed));
 
 const uint8_t ZipLocalFileHeaderSignature[4] = { 0x50, 0x4b, 0x03, 0x04  };
 const uint8_t ZipCentralDirectoryFileHeaderSignature[4] = { 0x50, 0x4b, 0x01, 0x02 };
@@ -105,7 +106,7 @@ const uint8_t ZipEndOfCentralDirectoryRecordSignature[4] = { 0x50, 0x4b,0x05, 0x
 		NSUInteger localHeaderLength = sizeof(struct ZipLocalFileHeader) + actualNameLength;
 		struct ZipLocalFileHeader *localHeader = calloc(1, localHeaderLength);
 		memcpy(localHeader->signature, ZipLocalFileHeaderSignature, 4);
-		localHeader->versionNeededToExtract = 10; // Default
+		localHeader->versionNeededToExtract = 20; // Default
 		localHeader->generalPurposeBitFlag = 0; // No feature
 		localHeader->compressionMethod = 0; // No compression
 		localHeader->lastModFileTime = 0; // No date set
@@ -122,7 +123,7 @@ const uint8_t ZipEndOfCentralDirectoryRecordSignature[4] = { 0x50, 0x4b,0x05, 0x
 		struct ZipCentralDirectoryFileHeader *centralDirectoryHeader = calloc(1, centralDirectoryHeaderLength);
 		memcpy(centralDirectoryHeader->signature, ZipCentralDirectoryFileHeaderSignature, 4);
 		centralDirectoryHeader->versionMadeBy = (45 << 8) | 19; // Version 4.5, which is what Word uses. On Mac OS X
-		centralDirectoryHeader->versionNeededToExtract = 10; // Default
+		centralDirectoryHeader->versionNeededToExtract = 20; // Default
 		centralDirectoryHeader->generalPurposeBitFlag = 0; // No feature
 		centralDirectoryHeader->compressionMethod = 0; // No compression
 		centralDirectoryHeader->lastModFileTime = 0; // No date set
@@ -155,6 +156,7 @@ const uint8_t ZipEndOfCentralDirectoryRecordSignature[4] = { 0x50, 0x4b,0x05, 0x
 	memcpy(endOfCentralDirectoryRecord.signature, ZipEndOfCentralDirectoryRecordSignature, 4);
 	endOfCentralDirectoryRecord.numberOfThisDisk = 0;
 	endOfCentralDirectoryRecord.numberOfDiskWithStartOfCentralDirectory = 0;
+	endOfCentralDirectoryRecord.numberOfEntriesInCentralDirectoryOnThisDisk = (uint16_t) self.files.count;
 	endOfCentralDirectoryRecord.numberOfEntriesInCentralDirectory = (uint16_t) self.files.count;
 	endOfCentralDirectoryRecord.sizeOfCentralDirectory = (uint32_t) centralDirectory.length;
 	endOfCentralDirectoryRecord.offsetOfStartOfCentralDirectoryWithRespectToStartingDiskNumber = (uint32_t) archiveData.length;

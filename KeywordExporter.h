@@ -33,7 +33,9 @@ extern NSString *ExporterOptionPageNumberSeparator; // NSString, defaults to @",
 + (NSArray *)entriesFromContext:(NSManagedObjectContext *)context sortDescriptors:(NSArray *)sortDescriptors error:(NSError **)error;
 + (NSArray *)keywordsFromContext:(NSManagedObjectContext *)context sortDescriptors:(NSArray *)sortDescriptors error:(NSError **)error;
 
-+ (NSData *)htmlCodeForConvertingEntries:(NSArray *)entries options:(NSDictionary *)options;
-+ (NSData *)htmlCodeForConvertingKeywords:(NSArray *)keywords options:(NSDictionary *)options;
++ (NSData *)htmlDataForConvertingEntries:(NSArray *)entries options:(NSDictionary *)options;
++ (NSData *)htmlDataForConvertingKeywords:(NSArray *)keywords options:(NSDictionary *)options;
++ (NSData *)docxDataForConvertingEntries:(NSArray *)entries options:(NSDictionary *)options;
++ (NSData *)docxDataForConvertingKeywords:(NSArray *)keywords options:(NSDictionary *)options;
 
 @end

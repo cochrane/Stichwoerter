@@ -37,6 +37,7 @@ static NSString *documentFilename = @"word/document.xml";
 	[relsRoot addChild:documentRelationship];
 	NSXMLDocument *rels = [[NSXMLDocument alloc] initWithRootElement:relsRoot];
 	rels.characterEncoding = @"UTF-8";
+	[rels setStandalone:YES];
 	
 	[archive addFileNamed:relsFilename data:rels.XMLData];
 	
@@ -45,17 +46,18 @@ static NSString *documentFilename = @"word/document.xml";
 	[contentTypesRoot addNamespace:[NSXMLNode namespaceWithName:@"" stringValue:contentTypesNamespace]];
 	// - rels
 	NSXMLElement *relsType = [NSXMLElement elementWithName:@"Override"];
-	[relsType addAttribute:[NSXMLNode attributeWithName:@"PartName" stringValue:relsFilename]];
+	[relsType addAttribute:[NSXMLNode attributeWithName:@"PartName" stringValue:[@"/" stringByAppendingString:relsFilename]]];
 	[relsType addAttribute:[NSXMLNode attributeWithName:@"ContentType" stringValue:relsContentType]];
 	[contentTypesRoot addChild:relsType];
 	// - document
 	NSXMLElement *documentType = [NSXMLElement elementWithName:@"Override"];
-	[documentType addAttribute:[NSXMLNode attributeWithName:@"PartName" stringValue:documentFilename]];
+	[documentType addAttribute:[NSXMLNode attributeWithName:@"PartName" stringValue:[@"/" stringByAppendingString:documentFilename]]];
 	[documentType addAttribute:[NSXMLNode attributeWithName:@"ContentType" stringValue:documentContentType]];
 	[contentTypesRoot addChild:documentType];
 	
 	NSXMLDocument *contentTypes = [[NSXMLDocument alloc] initWithRootElement:contentTypesRoot];
 	contentTypes.characterEncoding = @"UTF-8";
+	[contentTypes setStandalone:YES];
 	
 	[archive addFileNamed:contentTypesFilename data:contentTypes.XMLData];
 	

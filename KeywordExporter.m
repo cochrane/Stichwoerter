@@ -27,6 +27,9 @@ NSString *ExporterOptionPageNumberSeparator = @"Number separator key";
 
 + (NSArray *)_entitiesNamed:(NSString *)name fromContext:(NSManagedObjectContext *)context sortDescriptors:(NSArray *)descriptors error:(NSError **)error;
 
++ (TableDocument *)_documentForEntries:(NSArray *)entries options:(NSDictionary *)options;
++ (TableDocument *)_documentForKeywords:(NSArray *)entries options:(NSDictionary *)options;
+
 @end
 
 @implementation KeywordExporter
@@ -101,7 +104,27 @@ NSString *ExporterOptionPageNumberSeparator = @"Number separator key";
 #pragma mark -
 #pragma mark Exporting
 
-+ (NSData *)htmlCodeForConvertingEntries:(NSArray *)entries options:(NSDictionary *)options;
++ (NSData *)htmlDataForConvertingEntries:(NSArray *)entries options:(NSDictionary *)options;
+{
+	return [[self _documentForEntries:entries options:options] htmlRepresentation];
+}
+
++ (NSData *)htmlDataForConvertingKeywords:(NSArray *)keywords options:(NSDictionary *)options;
+{
+	return [[self _documentForKeywords:keywords options:options] htmlRepresentation];
+}
+
++ (NSData *)docxDataForConvertingEntries:(NSArray *)entries options:(NSDictionary *)options;
+{
+	return [[self _documentForEntries:entries options:options] docxRepresentation];
+}
+
++ (NSData *)docxDataForConvertingKeywords:(NSArray *)keywords options:(NSDictionary *)options;
+{
+	return [[self _documentForKeywords:keywords options:options] docxRepresentation];
+}
+
++ (TableDocument *)_documentForEntries:(NSArray *)entries options:(NSDictionary *)options;
 {
 	TableDocument *document = [[TableDocument alloc] init];
 	
@@ -126,11 +149,11 @@ NSString *ExporterOptionPageNumberSeparator = @"Number separator key";
 		if (includePage) [row addObject:[entry valueForKeyPath:@"page"]];
 		[document addLine:row];
 	}
-	
-	return [document htmlRepresentation];
+
+return document;
 }
 
-+ (NSData *)htmlCodeForConvertingKeywords:(NSArray *)keywords options:(NSDictionary *)options;
++ (TableDocument *)_documentForKeywords:(NSArray *)keywords options:(NSDictionary *)options;
 {
 	TableDocument *document = [[TableDocument alloc] init];
 	
@@ -149,7 +172,7 @@ NSString *ExporterOptionPageNumberSeparator = @"Number separator key";
 		[document addLine:@[ [keyword valueForKeyPath:@"word"], [sortedPages componentsJoinedByString:separator]] ];
 	}
 	
-	return [document htmlRepresentation];
+	return document;
 }
 
 @end

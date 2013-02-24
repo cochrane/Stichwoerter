@@ -103,8 +103,8 @@ static NSString *ExportDirectoryURLKey = @"ExportDirectoryURL";
 	}
 	else
 	{
-		[savePanel setNameFieldStringValue:[[[parentDocument displayName] stringByDeletingPathExtension] stringByAppendingPathExtension:@"doc"]];
-		[savePanel setAllowedFileTypes:[NSArray arrayWithObject:@"com.microsoft.word.doc"]];
+		[savePanel setNameFieldStringValue:[[[parentDocument displayName] stringByDeletingPathExtension] stringByAppendingPathExtension:@"docx"]];
+		[savePanel setAllowedFileTypes:[NSArray arrayWithObject:@"org.openxmlformats.wordprocessingml.document"]];
 	}
 	
 	[savePanel beginSheetModalForWindow:parentWindow completionHandler:^(NSInteger result){

@@ -33,7 +33,7 @@ OSStatus GeneratePreviewForURL(void *thisInterface, QLPreviewRequestRef preview,
 		
 		NSDictionary *htmlOptions = [NSDictionary dictionaryWithObjectsAndKeys:@"YES", ExporterOptionIncludeHeading, [NSString stringWithFormat:@"%@:styles.css", kQLPreviewContentIDScheme], ExporterOptionCSSFileName, nil];
 		
-		NSData *htmlData = [KeywordExporter htmlCodeForConvertingKeywords:keywords options:htmlOptions];
+		NSData *htmlData = [KeywordExporter htmlDataForConvertingKeywords:keywords options:htmlOptions];
 		
 		NSURL *cssFileURL = (__bridge_transfer NSURL *) CFBundleCopyResourceURL(myBundle, (__bridge CFStringRef) @"styles", (__bridge CFStringRef) @"css", NULL);
 		NSData *cssFileData = [NSData dataWithContentsOfURL:cssFileURL];

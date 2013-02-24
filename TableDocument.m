@@ -8,6 +8,10 @@
 
 #import "TableDocument.h"
 
+#import "SimpleWordprocessingMLFile.h"
+
+static NSString *wordprocessingNamespace = @"http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+
 @interface TableDocument ()
 {
 	NSMutableArray *rows;
@@ -81,7 +85,68 @@
 }
 - (NSData *)docxRepresentation;
 {
-	return nil;
+	NSXMLElement *root = [NSXMLElement elementWithName:@"document"];
+	[root addNamespace:[NSXMLNode namespaceWithName:@"" stringValue:wordprocessingNamespace]];
+	NSXMLElement *body = [NSXMLElement elementWithName:@"body"];
+	[root addChild:body];
+	
+	NSXMLElement *tbl = [NSXMLElement elementWithName:@"tbl"];
+	[body addChild:tbl];
+	
+	// Headers
+	if (self.headers)
+	{
+		NSXMLElement *tr = [NSXMLElement elementWithName:@"tr"];
+		[tbl addChild:tr];
+		for (NSString *header in self.headers)
+		{
+			NSXMLElement *tc = [NSXMLElement elementWithName:@"tc"];
+			[tr addChild:tc];
+			NSXMLElement *p = [NSXMLElement elementWithName:@"p"];
+			[tc addChild:p];
+			NSXMLElement *r = [NSXMLElement elementWithName:@"r"];
+			[p addChild:r];
+			NSXMLElement *t = [NSXMLElement elementWithName:@"t" stringValue:header];
+			[r addChild:t];
+			
+			// Make it bold
+			NSXMLElement *rPr = [NSXMLElement elementWithName:@"rPr"];
+			NSXMLElement *b = [NSXMLElement elementWithName:@"b"];
+			NSXMLElement *bCs = [NSXMLElement elementWithName:@"bCs"];
+			[rPr addChild:b];
+			[rPr addChild:bCs];
+			[r addChild:rPr];
+		}
+	}
+	
+	// Rows
+	for (NSArray *rowContents in rows)
+	{
+		NSXMLElement *tr = [NSXMLElement elementWithName:@"tr"];
+		[tbl addChild:tr];
+		for (NSString *cell in rowContents)
+		{
+			NSXMLElement *tc = [NSXMLElement elementWithName:@"tc"];
+			[tr addChild:tc];
+			NSXMLElement *p = [NSXMLElement elementWithName:@"p"];
+			[tc addChild:p];
+			NSXMLElement *r = [NSXMLElement elementWithName:@"r"];
+			[p addChild:r];
+			NSXMLElement *t = [NSXMLElement elementWithName:@"t" stringValue:cell];
+			[r addChild:t];
+		}
+	}
+	
+	// Prepare for writing
+	NSXMLDocument *document = [[NSXMLDocument alloc] initWithRootElement:root];
+	document.characterEncoding = @"UTF-8";
+	[document setStandalone:YES];
+	
+	// Create the whole stuff around it
+	SimpleWordprocessingMLFile *file = [[SimpleWordprocessingMLFile alloc] init];
+	file.document = document;
+	
+	return file.docxRepresentation;
 }
 
 @end

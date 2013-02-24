@@ -145,7 +145,7 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 		if (result == NSCancelButton)
 			return;
 		
-		NSData *htmlData = nil;
+		NSData *documentData = nil;
 		NSError *error = nil;
 		if (controller.exportMode == 1) // List
 		{
@@ -180,7 +180,10 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 				return;
 			}
 			
-			htmlData = [KeywordExporter htmlCodeForConvertingEntries:entries options:exportOptions];
+			if (controller.exportFormat == 1) // HTML
+				documentData = [KeywordExporter htmlDataForConvertingEntries:entries options:exportOptions];
+			else // Word
+				documentData = [KeywordExporter docxDataForConvertingEntries:entries options:exportOptions];
 		}
 		else // Directory
 		{
@@ -202,29 +205,21 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 				return;
 			}
 			
-			htmlData = [KeywordExporter htmlCodeForConvertingKeywords:keywords options:exportOptions];
+			if (controller.exportFormat == 1) // HTML
+				documentData = [KeywordExporter htmlDataForConvertingKeywords:keywords options:exportOptions];
+			else // Word
+				documentData = [KeywordExporter docxDataForConvertingKeywords:keywords options:exportOptions];
 		}
 		
-		if (!htmlData)
+		if (!documentData)
 		{
 			[self presentError:error];
 			return;
 		}
-		if (controller.exportFormat == 1)
-		{
-			// HTML. Write it to disk directly.
-			BOOL result = [htmlData writeToURL:[savePanel URL] atomically:YES];
-			
-			if (!result) [self presentError:error];
-		}
-		else
-		{
-			// Doc			
-			NSAttributedString *attributedString = [[NSAttributedString alloc] initWithHTML:htmlData documentAttributes:NULL];
-			
-			NSData *docData = [attributedString docFormatFromRange:NSMakeRange(0, [attributedString length]) documentAttributes:nil];
-			[docData writeToURL:[savePanel URL] atomically:YES];
-		}
+		
+		if (![documentData writeToURL:savePanel.URL options:NSDataWritingAtomic error:&error])
+			[self presentError:error];
+		
 		[[savePanel URL] setResourceValue:[NSNumber numberWithBool:[savePanel isExtensionHidden]] forKey:NSURLHasHiddenExtensionKey error:NULL];
 	}];
 }
@@ -266,14 +261,16 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 	else if ([type isEqual:NSPasteboardTypeHTML] || [type isEqual:NSPasteboardTypeRTF] || [type isEqual:NSPasteboardTypeRTFD])
 	{
 		NSDictionary *exportOptions = [NSDictionary dictionaryWithObjectsAndKeys:@"NO", ExporterOptionIncludeHeading, @"YES", ExporterOptionIncludeDate, @"YES", ExporterOptionIncludeWord, @"YES", ExporterOptionIncludePage, nil];
-		NSString *htmlSource = [KeywordExporter htmlCodeForConvertingEntries:actualData options:exportOptions];
+		NSData *htmlData = [KeywordExporter htmlDataForConvertingEntries:actualData options:exportOptions];
 		
 		if ([type isEqual:NSPasteboardTypeHTML])
-			[sender setString:htmlSource forType:NSPasteboardTypeHTML];
+		{
+			NSString *htmlString = [[NSString alloc] initWithBytes:htmlData.bytes length:htmlData.length encoding:NSUTF8StringEncoding];
+			[sender setString:htmlString forType:NSPasteboardTypeHTML];
+		}
 		else
 		{
-			NSData *utf8HTMLData = [htmlSource dataUsingEncoding:NSUTF8StringEncoding];
-			NSAttributedString *attributedString = [[NSAttributedString alloc] initWithHTML:utf8HTMLData documentAttributes:NULL];
+			NSAttributedString *attributedString = [[NSAttributedString alloc] initWithHTML:htmlData documentAttributes:NULL];
 			
 			if ([type isEqual:NSPasteboardTypeRTF])
 			{
