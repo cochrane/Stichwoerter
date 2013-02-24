@@ -25,7 +25,6 @@ NSString *ExporterOptionPageNumberSeparator = @"Number separator key";
 
 @interface KeywordExporter()
 
-+ (NSMutableString *)_createBeginningWithOptions:(NSDictionary *)options;
 + (NSArray *)_entitiesNamed:(NSString *)name fromContext:(NSManagedObjectContext *)context sortDescriptors:(NSArray *)descriptors error:(NSError **)error;
 
 @end
@@ -102,26 +101,9 @@ NSString *ExporterOptionPageNumberSeparator = @"Number separator key";
 #pragma mark -
 #pragma mark Exporting
 
-+ (NSMutableString *)_createBeginningWithOptions:(NSDictionary *)options;
++ (NSData *)htmlCodeForConvertingEntries:(NSArray *)entries options:(NSDictionary *)options;
 {
-	NSMutableString *resultString = [NSMutableString stringWithString:@"<!DOCTYPE html>\n<html><head>"];
-	if ([options objectForKey:ExporterOptionFileTitle])
-		[resultString appendFormat:@"<title>%@</title>", [options objectForKey:ExporterOptionFileTitle]];
-	else
-		[resultString appendString:@"<title></title>"];
-	
-	[resultString appendString:@"<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">"];
-	if ([options objectForKey:ExporterOptionCSSFileName])
-		[resultString appendFormat:@"<link rel=\"stylesheet\" type=\"text/css\" href=\"%@\">", [options objectForKey:ExporterOptionCSSFileName]];
-	
-	[resultString appendString:@"</head><body><table>"];
-	
-	return resultString;
-}
-
-+ (NSString *)htmlCodeForConvertingEntries:(NSArray *)entries options:(NSDictionary *)options;
-{
-	NSMutableString *resultString = [self _createBeginningWithOptions:options];
+	TableDocument *document = [[TableDocument alloc] init];
 	
 	BOOL includeDate = [[options objectForKey:ExporterOptionIncludeDate] boolValue];
 	BOOL includeWord = !options || ![options objectForKey:ExporterOptionIncludeWord] || [[options objectForKey:ExporterOptionIncludeWord] boolValue];
@@ -129,25 +111,23 @@ NSString *ExporterOptionPageNumberSeparator = @"Number separator key";
 	
 	if (!options || ![options objectForKey:ExporterOptionIncludeHeading] || [[options objectForKey:ExporterOptionIncludeHeading] boolValue])
 	{
-		[resultString appendString:@"<tr>"];
-		if (includeDate) [resultString appendFormat:@"<th>%@</th>", NSLocalizedString(@"Entered on", @"Export date header")];
-		if (includeWord) [resultString appendFormat:@"<th>%@</th>", NSLocalizedString(@"Keyword", @"Export keyword header")];
-		if (includePage) [resultString appendFormat:@"<th>%@</th>", NSLocalizedString(@"On Page", @"Export page header")];
-		[resultString appendString:@"</tr>"];
+		NSMutableArray *headers = [NSMutableArray array];
+		if (includeDate) [headers addObject:NSLocalizedString(@"Entered on", @"Export date header")];
+		if (includeWord) [headers addObject: NSLocalizedString(@"Keyword", @"Export keyword header")];
+		if (includePage) [headers addObject:NSLocalizedString(@"On Page", @"Export page header")];
+		document.headers = headers;
 	}
 	
 	for (id entry in entries)
 	{
-		[resultString appendString:@"<tr>"];
-		if (includeDate) [resultString appendFormat:@"<td>%@</td>", [entry valueForKeyPath:@"enteredOn"]];
-		if (includeWord) [resultString appendFormat:@"<td>%@</td>", [entry valueForKeyPath:@"word.word"]];
-		if (includePage) [resultString appendFormat:@"<td>%@</td>", [entry valueForKeyPath:@"page"]];
-		[resultString appendString:@"</tr>"];
+		NSMutableArray *row = [NSMutableArray array];
+		if (includeDate) [row addObject:[entry valueForKeyPath:@"enteredOn"]];
+		if (includeWord) [row addObject:[entry valueForKeyPath:@"word.word"]];
+		if (includePage) [row addObject:[entry valueForKeyPath:@"page"]];
+		[document addLine:row];
 	}
 	
-	[resultString appendString:@"</table></body></html>"];
-	
-	return [resultString copy];
+	return [document htmlRepresentation];
 }
 
 + (NSData *)htmlCodeForConvertingKeywords:(NSArray *)keywords options:(NSDictionary *)options;

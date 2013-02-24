@@ -145,7 +145,7 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 		if (result == NSCancelButton)
 			return;
 		
-		NSString *htmlSourceCode = nil;
+		NSData *htmlData = nil;
 		NSError *error = nil;
 		if (controller.exportMode == 1) // List
 		{
@@ -180,7 +180,7 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 				return;
 			}
 			
-			htmlSourceCode = [KeywordExporter htmlCodeForConvertingEntries:entries options:exportOptions];
+			htmlData = [KeywordExporter htmlCodeForConvertingEntries:entries options:exportOptions];
 		}
 		else // Directory
 		{
@@ -202,11 +202,10 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 				return;
 			}
 			
-			NSData *htmlData = [KeywordExporter htmlCodeForConvertingKeywords:keywords options:exportOptions];
-			htmlSourceCode = [[NSString alloc] initWithBytes:htmlData.bytes length:htmlData.length encoding:NSUTF8StringEncoding];
+			htmlData = [KeywordExporter htmlCodeForConvertingKeywords:keywords options:exportOptions];
 		}
 		
-		if (!htmlSourceCode)
+		if (!htmlData)
 		{
 			[self presentError:error];
 			return;
@@ -214,16 +213,14 @@ static NSString *StichwoerterPboardType = @"de.ferroequinologist.stw.pboardtype"
 		if (controller.exportFormat == 1)
 		{
 			// HTML. Write it to disk directly.
-			BOOL result = [htmlSourceCode writeToURL:[savePanel URL] atomically:YES encoding:NSUTF8StringEncoding error:&error];
+			BOOL result = [htmlData writeToURL:[savePanel URL] atomically:YES];
 			
 			if (!result) [self presentError:error];
 		}
 		else
 		{
-			// Doc
-			NSData *utf8HTMLData = [htmlSourceCode dataUsingEncoding:NSUTF8StringEncoding];
-			
-			NSAttributedString *attributedString = [[NSAttributedString alloc] initWithHTML:utf8HTMLData documentAttributes:NULL];
+			// Doc			
+			NSAttributedString *attributedString = [[NSAttributedString alloc] initWithHTML:htmlData documentAttributes:NULL];
 			
 			NSData *docData = [attributedString docFormatFromRange:NSMakeRange(0, [attributedString length]) documentAttributes:nil];
 			[docData writeToURL:[savePanel URL] atomically:YES];
